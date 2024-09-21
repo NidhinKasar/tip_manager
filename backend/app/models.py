@@ -12,11 +12,7 @@ class Tip(Base):
     total_amount = Column(Float, nullable=False)
     tip_amount = Column(Float, nullable=False)
     time = Column(DateTime, default=datetime.utcnow)
-
-    # Foreign key to link each tip to a specific user
     user_id = Column(Integer, ForeignKey("users.id"))
-    
-    # Relationship to user
     user = relationship("User", back_populates="tips")
 
 class User(Base):
@@ -26,6 +22,5 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String, nullable=False)
     profile_image = Column(String, nullable=True)
-
-    # Relationship to tips
+    session_token = Column(String, nullable=True) 
     tips = relationship("Tip", back_populates="user")

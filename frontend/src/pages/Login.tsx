@@ -14,6 +14,7 @@ const LoginPage: React.FC = () => {
     onSuccess: (data) => {
       setError(null);
       localStorage.setItem('user_data', JSON.stringify(data));
+      localStorage.setItem('access_token', data.access_token);
       navigate('/home')
       // Redirect user or handle login success
     },

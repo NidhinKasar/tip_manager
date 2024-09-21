@@ -42,15 +42,15 @@ export const loginUser = async ({
   email: string;
   password: string;
 }) => {
-  const response = await postApi("http://localhost:8000/api/user/login", {
+  const response = await axios.post("http://localhost:8000/api/user/login", {
     email,
     password,
   }); // Replace with your API URL
-  return response;
+  return response.data;
 };
 
 export const GetAllTips = async (user_id: string, startDate?: string, endDate?: string) => {
-  let query = `user_id=${user_id}`;
+  let query = '';
   
   if (startDate) {
     query += `&startDate=${startDate}`;
@@ -59,13 +59,13 @@ export const GetAllTips = async (user_id: string, startDate?: string, endDate?: 
   if (endDate) {
     query += `&endDate=${endDate}`;
   }
-  const response = await getApi(`http://localhost:8000/api/tip?${query}`);
+  const response = await getApi(`http://localhost:8000/api/tip${query ? '?' + query : ''}`);
   
   return response;
 };
 
 
 export const CalculateTip = async ( user_id: string, total_amount: string, percentage: string, place: string) => {
-  const response = await postApi(`http://localhost:8000/api/tip/calculate?user_id=${user_id}&place=${place}&total_amount=${total_amount}&percentage=${percentage}`);
+  const response = await postApi(`http://localhost:8000/api/tip/calculate?place=${place}&total_amount=${total_amount}&percentage=${percentage}`);
   return response;
 }

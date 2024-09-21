@@ -9,6 +9,20 @@ const axiosInstance = axios.create({
   withCredentials: true,  // Allow credentials like cookies or authorization headers
 });
 
+// Add a request interceptor to attach the token
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token"); // Replace with your key for the token
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`; // Attach token as Bearer
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Function to handle POST requests
 export const postApi = async (url: string, data?: any) => {
   try {

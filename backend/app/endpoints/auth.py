@@ -35,6 +35,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
+    if 'sub' in to_encode:
+        to_encode['sub'] = str(to_encode['sub'])
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -93,7 +95,7 @@ def signup(
     db.refresh(new_user)
 
     # Generate JWT token
-    access_token = create_access_token(data={"sub": new_user.email})
+    access_token = create_access_token(data={"sub": new_user.id})
 
     return {
         "name": new_user.name,
@@ -103,15 +105,22 @@ def signup(
 # Login route for existing users
 @router.post("/user/login", status_code=200)
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
-    # Query the user by email
     user = db.query(User).filter(User.email == user_data.email).first()
 
-    # Verify user existence and password
     if not user or not bcrypt.verify(user_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail={"message": "Invalid credentials"})
 
-    # Generate JWT token
-    access_token = create_access_token(data={"sub": user.email})
+    # Check if there's an existing session token
+    if user.session_token:
+        # Log out from the previous session
+        user.session_token = None
+        db.commit()
+
+    # Generate new session token
+    access_token = create_access_token(data={"sub": user.id})
+    user.session_token = access_token  # Store the new session token
+    db.commit()
+
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -121,3 +130,4 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
         "profile_picture": user.profile_image,
         "user_id": user.id
     }
+

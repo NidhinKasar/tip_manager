@@ -5,8 +5,14 @@ from database import SessionLocal
 from models import Tip, User
 from datetime import datetime
 from sqlalchemy import and_
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 
 router = APIRouter()
+
+SECRET_KEY = "9745713706"
+ALGORITHM = "HS256"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def get_db() -> Generator:
@@ -15,6 +21,27 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: int = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+        
+        # Check if the session token matches
+        user = db.query(User).filter(User.id == user_id).first()
+        if user is None or user.session_token != token:
+            raise credentials_exception
+
+    except JWTError:
+        raise credentials_exception
+    return user_id
 
 def parse_date(date_str: str):
     try:
@@ -28,10 +55,10 @@ def parse_date(date_str: str):
 
 @router.post("/tip/calculate", status_code=200)
 def calculate_tip(
-    user_id: int,  # Accept user_id from the frontend
     place: str,
     total_amount: float,
     percentage: float,
+    user_id: int = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     # Check if the user exists
@@ -66,10 +93,10 @@ def calculate_tip(
 
 @router.get("/tip", response_model=List[dict], status_code=200)
 def get_all_tips(
-    user_id: int,
     startDate: str = Query(None),
     endDate: str = Query(None),
     db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user),
 ):
     start_date = parse_date(startDate) if startDate else None
     end_date = parse_date(endDate) if endDate else None
