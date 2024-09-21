@@ -1,0 +1,44 @@
+version: '3'
+services:  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./dockerfile   
+    ports:      
+      - "3000:3000" 
+    volumes:
+      - ./frontend/src:/frontend/src
+      - ./frontend/public:/frontend/public   
+    depends_on:     
+      - backend  
+    command: [ 'npm', 'run', 'dev', '--', '--host' ]
+    restart: unless-stopped
+  backend:    
+    build:
+      context: ./backend
+      dockerfile: ./dockerfile   
+    ports:      
+      - "8000:8000"    
+    depends_on:      
+      - db  
+    restart: unless-stopped
+    volumes:
+      - ./backend/app:/app/app
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+  db:    
+    image: postgres    
+    environment:      
+      POSTGRES_USER: user      
+      POSTGRES_PASSWORD: password      
+      POSTGRES_DB: tipmanager    
+    ports:      
+        - "5432:5432"
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db

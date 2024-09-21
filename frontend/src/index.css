@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tw-font-sans: 'Work Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+
