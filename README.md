@@ -9,10 +9,7 @@ The "Tip Manager" app allows users to calculate tips and store the calculations 
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
 - [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
-- [Usage](#usage)
-- [License](#license)
-
+  
 ## Features
 
 - User authentication (signup, login)
@@ -44,3 +41,30 @@ Make sure you have the following installed on your machine:
    ```bash
    git clone https://github.com/yourusername/project-name.git
    cd project-name
+
+## Running the Application
+
+## Docker Commands
+
+### Build Docker Images
+
+To build the Docker images for your application, run:
+```bash
+docker-compose build
+```
+
+### Build Docker Images
+
+To start all the services defined in your docker-compose.yml file, use:
+
+```bash
+docker-compose up
+```
+
+### Stop the Application
+To stop the running containers, press CTRL+C or run:
+
+```bash
+docker-compose down
+```
+
