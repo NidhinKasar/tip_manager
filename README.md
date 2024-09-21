@@ -1,6 +1,6 @@
-# Project Name
+# Tip Manager
 
-A brief description of your project, its purpose, and its functionalities.
+The "Tip Manager" app allows users to calculate tips and store the calculations in a database. Users can sign up, log in, calculate tips, and retrieve tip.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ A brief description of your project, its purpose, and its functionalities.
 
 - FastAPI for the backend
 - React.js for the frontend
-- PostgreSQL (or any other database you're using)
+- PostgreSQL
 - Docker for containerization
 - SQLAlchemy for database interactions
 - Passlib for password hashing
