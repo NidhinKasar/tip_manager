@@ -130,3 +130,20 @@ def get_all_tips(
     ]
 
     return response
+
+@router.delete("/tip/delete", response_model=List[dict], status_code=200)
+def delete_tip(
+    tip_id: int,
+    db: Session = Depends(get_db)
+):
+    rep = db.query(Tip).filter(Tip.id == tip_id).delete()
+    db.commit()
+    db.close()
+    if(rep):
+        return {
+            "message": f"{rep} tip(s) deleted successfully"
+        }
+    else:
+        return {
+            "message": "No tip found with given ID"
+        }

@@ -5,7 +5,7 @@ import { CalculateTip } from "../services/api.ts";
 
 const TipCalculator: React.FC = () => {
   const [amount, setAmount] = useState<string>("");
-  const [tipPercentage, setTipPercentage] = useState<string>("");
+  const [tipPercentage, setTipPercentage] = useState<any>("");
   const [place, setPlace] = useState<string>("");
   const [tipResult, setTipResult] = useState<number | null>(null);
   const [error, setError] = useState<string>("");
@@ -48,7 +48,10 @@ const TipCalculator: React.FC = () => {
       setError("Please enter the amount, tip percentage, and place.");
       return;
     }
-
+    if (tipPercentage < 0) {
+      setError("Tip percentage should be positive");
+      return
+   }
     try {
       mutation.mutate({
         amount_in: amount,
@@ -59,6 +62,13 @@ const TipCalculator: React.FC = () => {
       setError("Error calculating tip. Please try again.");
     }
   };
+
+  const handleTipPercentage = (input: any) => {
+    if (input > 0 || input === '') {
+      setTipPercentage(input)
+      setError('')
+    }
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-full bg-gray-100">
@@ -108,7 +118,7 @@ const TipCalculator: React.FC = () => {
               type="number"
               id="tipPercentage"
               value={tipPercentage}
-              onChange={(e) => setTipPercentage(e.target.value)}
+              onChange={(e) => handleTipPercentage(e?.target?.value) }
               required
               className="mt-1 block w-full border border-gray-300 rounded-md p-2"
             />
